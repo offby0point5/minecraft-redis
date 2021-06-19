@@ -1,0 +1,3 @@
+name: MinecraftRedis
+version: ${project.version}
+main: com.github.offby0point5.minecraftredis.MinecraftRedisBungeeCord

@@ -18,8 +18,8 @@ public class NetworkSingleServer {
 
     private final String name;
     private final InetSocketAddress address;
-    private ServerOnlineStatus status;
-    private NetworkServerGroup main;
+    private final NetworkServerGroup main;
+    private ServerStatus status;
     private Set<NetworkServerGroup> groups;
     private Set<NetworkSinglePlayer> players;
 
@@ -29,6 +29,9 @@ public class NetworkSingleServer {
         try (Jedis jedis = NetRedis.getJedis()) {
             String[] inetAddr = jedis.get(String.format("%s:%s:address", PREFIX, name)).split("\\n");
             address = new InetSocketAddress(inetAddr[0], Integer.parseInt(inetAddr[1]));
+
+            String mainGroupName = jedis.get(String.format("%s:%s:main", PREFIX, name));
+            main = NetworkServerGroup.getInstance(mainGroupName);
         }
         update();
     }
@@ -36,10 +39,7 @@ public class NetworkSingleServer {
     public void update() {
         try (Jedis jedis = NetRedis.getJedis()) {
             String onlineStatus = jedis.get(String.format("%s:%s:status", PREFIX, name));
-            status = ServerOnlineStatus.valueOf(onlineStatus);
-
-            String mainGroupName = jedis.get(String.format("%s:%s:main", PREFIX, name));
-            main = NetworkServerGroup.getInstance(mainGroupName);
+            status = ServerStatus.valueOf(onlineStatus);
 
             Set<String> allGroupNames = jedis.smembers(String.format("%s:%s:groups", PREFIX, name));
             groups = new HashSet<>();
@@ -63,7 +63,7 @@ public class NetworkSingleServer {
         return address;
     }
 
-    public ServerOnlineStatus getStatus() {
+    public ServerStatus getStatus() {
         return status;
     }
 
@@ -79,7 +79,7 @@ public class NetworkSingleServer {
         return players;
     }
 
-    private enum ServerOnlineStatus {
+    private enum ServerStatus {
         ONLINE,
         SOFT_FULL,
         HARD_FULL

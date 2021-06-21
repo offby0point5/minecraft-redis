@@ -21,7 +21,14 @@ public class NetworkSinglePlayer {
     private NetworkSingleServer server;
     private NetworkPlayerGroup playerGroup;
 
+    private final String SERVER;
+    private final String GROUP;
+
+
     private NetworkSinglePlayer(UUID playerUuid) {
+        SERVER = String.format("%s:%s:server", PREFIX, playerUuid);
+        GROUP = String.format("%s:%s:group", PREFIX, playerUuid);
+
         players.put(playerUuid, this);
         this.uuid = playerUuid;
         update();
@@ -29,10 +36,10 @@ public class NetworkSinglePlayer {
 
     public void update() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            String serverName = jedis.get(String.format("%s:%s:server", PREFIX, uuid));
+            String serverName = jedis.get(SERVER);
             server = NetworkSingleServer.getInstance(serverName);
 
-            String groupID = jedis.get(String.format("%s:%s:group", PREFIX, uuid));
+            String groupID = jedis.get(GROUP);
             playerGroup = NetworkPlayerGroup.getInstance(UUID.fromString(groupID));
         }
     }

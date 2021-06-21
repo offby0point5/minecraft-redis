@@ -23,14 +23,24 @@ public class NetworkSingleServer {
     private Set<NetworkServerGroup> groups;
     private Set<NetworkSinglePlayer> players;
 
+    private final String PLAYERS;
+    private final String STATUS;
+    private final String GROUPS;
+
     private NetworkSingleServer(String serverName) {
+         PLAYERS = String.format("%s:%s:players", PREFIX, serverName);
+        String ADDRESS = String.format("%s:%s:address", PREFIX, serverName);
+        String MAIN_GROUP = String.format("%s:%s:main", PREFIX, serverName);
+         STATUS = String.format("%s:%s:status", PREFIX, serverName);
+         GROUPS = String.format("%s:%s:groups", PREFIX, serverName);
+
         servers.put(serverName, this);
         name = serverName;
         try (Jedis jedis = NetRedis.getJedis()) {
-            String[] inetAddr = jedis.get(String.format("%s:%s:address", PREFIX, name)).split("\\n");
+            String[] inetAddr = jedis.get(ADDRESS).split("\\n");
             address = new InetSocketAddress(inetAddr[0], Integer.parseInt(inetAddr[1]));
 
-            String mainGroupName = jedis.get(String.format("%s:%s:main", PREFIX, name));
+            String mainGroupName = jedis.get(MAIN_GROUP);
             main = NetworkServerGroup.getInstance(mainGroupName);
         }
         update();
@@ -38,16 +48,16 @@ public class NetworkSingleServer {
 
     public void update() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            String onlineStatus = jedis.get(String.format("%s:%s:status", PREFIX, name));
+            String onlineStatus = jedis.get(STATUS);
             status = ServerStatus.valueOf(onlineStatus);
 
-            Set<String> allGroupNames = jedis.smembers(String.format("%s:%s:groups", PREFIX, name));
+            Set<String> allGroupNames = jedis.smembers(GROUPS);
             groups = new HashSet<>();
             for (String groupName : allGroupNames) {
                 groups.add(NetworkServerGroup.getInstance(groupName));
             }
 
-            Set<String> playerUUIDs = jedis.smembers(String.format("%s:%s:players", PREFIX, name));
+            Set<String> playerUUIDs = jedis.smembers(PLAYERS);
             players = new HashSet<>();
             for (String playerUUID : playerUUIDs) {
                 players.add(NetworkSinglePlayer.getInstance(UUID.fromString(playerUUID)));

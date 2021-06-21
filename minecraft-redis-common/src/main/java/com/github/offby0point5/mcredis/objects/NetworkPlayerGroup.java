@@ -19,7 +19,13 @@ public class NetworkPlayerGroup {
     private NetworkSinglePlayer leader;
     private Set<NetworkSinglePlayer> members;
 
+    private final String LEADER;
+    private final String MEMBERS;
+
     private NetworkPlayerGroup(UUID groupID) {
+        LEADER = String.format("%s:%s:leader", PREFIX, groupID);
+        MEMBERS = String.format("%s:%s:members", PREFIX, groupID);
+
         groups.put(groupID, this);
         uuid = groupID;
         update();
@@ -27,13 +33,12 @@ public class NetworkPlayerGroup {
 
     public void update() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            String leaderID = jedis.get(String.format("%s:leader", PREFIX));
+            String leaderID = jedis.get(LEADER);
             leader = NetworkSinglePlayer.getInstance(UUID.fromString(leaderID));
 
-            Set<String> memberPlayerIDs = jedis.smembers(String.format("%s:members", PREFIX));
+            Set<String> memberPlayerIDs = jedis.smembers(MEMBERS);
             members = new HashSet<>();
-            for (String playerID :
-                    memberPlayerIDs) {
+            for (String playerID : memberPlayerIDs) {
                 members.add(NetworkSinglePlayer.getInstance(UUID.fromString(playerID)));
             }
         }

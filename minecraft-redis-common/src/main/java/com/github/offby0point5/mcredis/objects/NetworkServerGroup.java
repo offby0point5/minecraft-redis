@@ -27,14 +27,20 @@ public class NetworkServerGroup {
     private final ServerGroupKickRule kickRule;
     private Set<NetworkSingleServer> members;
 
+    private final String MEMBERS;
+
     private NetworkServerGroup(String groupName) {
+        String JOIN_RULE = String.format("%s:%s:join-rule", PREFIX, groupName);
+        String KICK_RULE = String.format("%s:%s:kick-rule", PREFIX, groupName);
+        MEMBERS = String.format("%s:%s:members", PREFIX, groupName);
+
         groups.put(groupName, this);
         name = groupName;
         try (Jedis jedis = NetRedis.getJedis()) {
-            String joinRuleName = jedis.get(String.format("%s:%s:join-rule", PREFIX, name));
+            String joinRuleName = jedis.get(JOIN_RULE);
             joinRule = JoinRules.valueOf(joinRuleName);
 
-            String kickRuleName = jedis.get(String.format("%s:%s:kick-rule", PREFIX, name));
+            String kickRuleName = jedis.get(KICK_RULE);
             kickRule = KickRules.valueOf(kickRuleName);
         }
         update();
@@ -42,7 +48,7 @@ public class NetworkServerGroup {
 
     public void update() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            Set<String> memberNames = jedis.smembers(String.format("%s:%s:members", PREFIX, name));
+            Set<String> memberNames = jedis.smembers(MEMBERS);
             members = new HashSet<>();
             for (String memberName : memberNames) {
                 members.add(NetworkSingleServer.getInstance(memberName));

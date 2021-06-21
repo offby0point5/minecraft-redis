@@ -71,4 +71,18 @@ public class NetworkServerGroup {
     public Set<NetworkSingleServer> getMembers() {
         return members;
     }
+
+    protected void addServer(NetworkSingleServer server) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            members.add(server);
+            jedis.sadd(MEMBERS, server.getName());
+        }
+    }
+
+    protected void removeServer(NetworkSingleServer server) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            members.remove(server);
+            jedis.srem(MEMBERS, server.getName());
+        }
+    }
 }

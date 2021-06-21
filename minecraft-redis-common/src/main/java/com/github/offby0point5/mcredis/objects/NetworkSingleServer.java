@@ -77,6 +77,10 @@ public class NetworkSingleServer {
         return status;
     }
 
+    public void setStatus(ServerStatus status) {
+        this.status = status;
+    }
+
     public NetworkServerGroup getMain() {
         return main;
     }
@@ -89,7 +93,40 @@ public class NetworkSingleServer {
         return players;
     }
 
-    private enum ServerStatus {
+    public void join(NetworkServerGroup group) {
+
+    }
+
+    public void playerJoin(NetworkSinglePlayer player) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.sadd(PLAYERS, player.getUuid().toString());
+            this.players.add(player);
+            player.setServer(this);
+        }
+    }
+
+    public void playerLeave(NetworkSinglePlayer player) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.srem(PLAYERS, player.getUuid().toString());
+            this.players.remove(player);
+        }
+    }
+
+    public void joinGroup(NetworkServerGroup group) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            group.addServer(this);
+            jedis.sadd(GROUPS, group.getName());
+        }
+    }
+
+    public void leaveGroup(NetworkServerGroup group) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            group.removeServer(this);
+            jedis.srem(GROUPS, group.getName());
+        }
+    }
+
+    public enum ServerStatus {
         ONLINE,
         SOFT_FULL,
         HARD_FULL

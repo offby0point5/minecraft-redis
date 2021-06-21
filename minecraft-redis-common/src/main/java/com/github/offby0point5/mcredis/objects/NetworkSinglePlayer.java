@@ -52,6 +52,14 @@ public class NetworkSinglePlayer {
         return server;
     }
 
+    protected void setServer(NetworkSingleServer server) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            this.server = server;
+            jedis.set(SERVER, server.getName());
+        }
+
+    }
+
     public NetworkPlayerGroup getPlayerGroup() {
         return playerGroup;
     }

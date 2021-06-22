@@ -4,7 +4,7 @@ import com.github.offby0point5.mcredis.objects.NetworkServerGroup;
 import com.github.offby0point5.mcredis.objects.NetworkSinglePlayer;
 import com.github.offby0point5.mcredis.objects.NetworkSingleServer;
 
-public enum KickRules implements ServerGroupKickRule {
+public enum KickRules {
     NONE((player, kickedFrom) -> null),
     ;
 
@@ -14,8 +14,11 @@ public enum KickRules implements ServerGroupKickRule {
         rule = kickRule;
     }
 
-    @Override
     public NetworkServerGroup getNewGroup(NetworkSinglePlayer player, NetworkSingleServer kickedFrom) {
         return rule.getNewGroup(player, kickedFrom);
+    }
+
+    private interface ServerGroupKickRule {
+        NetworkServerGroup getNewGroup(NetworkSinglePlayer player, NetworkSingleServer kickedFrom);
     }
 }

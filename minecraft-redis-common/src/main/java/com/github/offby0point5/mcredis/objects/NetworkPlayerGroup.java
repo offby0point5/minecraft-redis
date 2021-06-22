@@ -6,7 +6,7 @@ import redis.clients.jedis.Jedis;
 import java.util.*;
 
 public class NetworkPlayerGroup {
-    private static final String PREFIX = String.format("%S:player-group", NetRedis.NETWORK_PREFIX);
+    public static final String PREFIX = String.format("%S:player-group", NetRedis.NETWORK_PREFIX);
 
     private static final Map<UUID, NetworkPlayerGroup> groups = new HashMap<>();
 

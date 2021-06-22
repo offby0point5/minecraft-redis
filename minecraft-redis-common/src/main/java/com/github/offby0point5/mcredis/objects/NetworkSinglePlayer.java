@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class NetworkSinglePlayer {
-    private static final String PREFIX = String.format("%S:player", NetRedis.NETWORK_PREFIX);
+    public static final String PREFIX = String.format("%S:player", NetRedis.NETWORK_PREFIX);
 
     private static final Map<UUID, NetworkSinglePlayer> players = new HashMap<>();
 

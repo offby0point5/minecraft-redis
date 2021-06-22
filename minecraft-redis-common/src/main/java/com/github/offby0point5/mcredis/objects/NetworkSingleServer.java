@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 
 public class NetworkSingleServer {
-    private static final String PREFIX = String.format("%S:server", NetRedis.NETWORK_PREFIX);
+    public static final String PREFIX = String.format("%S:server", NetRedis.NETWORK_PREFIX);
 
     private static final Map<String, NetworkSingleServer> servers = new HashMap<>();
 

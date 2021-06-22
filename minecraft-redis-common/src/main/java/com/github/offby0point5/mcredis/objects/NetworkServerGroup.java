@@ -8,7 +8,7 @@ import redis.clients.jedis.Jedis;
 import java.util.*;
 
 public class NetworkServerGroup {
-    private static final String PREFIX = String.format("%S:server-group", NetRedis.NETWORK_PREFIX);
+    public static final String PREFIX = String.format("%S:server-group", NetRedis.NETWORK_PREFIX);
 
     private static final Map<String, NetworkServerGroup> groups = new HashMap<>();
 

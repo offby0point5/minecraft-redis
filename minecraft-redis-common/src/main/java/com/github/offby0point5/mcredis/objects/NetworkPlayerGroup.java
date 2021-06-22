@@ -16,13 +16,14 @@ public class NetworkPlayerGroup {
     }
 
     private final UUID uuid;
-    private NetworkSinglePlayer leader;
-    private Set<NetworkSinglePlayer> members;
+    private NetworkSinglePlayer leader; // TODO: 22.06.21 use a LeaderPlayer extending a PartiedPlayer
+    private Set<NetworkSinglePlayer> members; // TODO: 22.06.21 use a PartiedPlayer extending a NetworkSinglePlayer
 
     private final String LEADER;
     private final String MEMBERS;
 
     private NetworkPlayerGroup(UUID groupID) {
+        Objects.requireNonNull(groupID);
         LEADER = String.format("%s:%s:leader", PREFIX, groupID);
         MEMBERS = String.format("%s:%s:members", PREFIX, groupID);
 

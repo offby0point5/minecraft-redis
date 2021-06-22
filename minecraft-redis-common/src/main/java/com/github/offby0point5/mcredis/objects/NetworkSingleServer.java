@@ -28,6 +28,7 @@ public class NetworkSingleServer {
     private final String GROUPS;
 
     private NetworkSingleServer(String serverName) {
+        Objects.requireNonNull(serverName);
          PLAYERS = String.format("%s:%s:players", PREFIX, serverName);
         String ADDRESS = String.format("%s:%s:address", PREFIX, serverName);
         String MAIN_GROUP = String.format("%s:%s:main", PREFIX, serverName);
@@ -38,9 +39,11 @@ public class NetworkSingleServer {
         name = serverName;
         try (Jedis jedis = NetRedis.getJedis()) {
             String[] inetAddr = jedis.get(ADDRESS).split("\\n");
+            Objects.requireNonNull(inetAddr);
             address = new InetSocketAddress(inetAddr[0], Integer.parseInt(inetAddr[1]));
 
             String mainGroupName = jedis.get(MAIN_GROUP);
+            Objects.requireNonNull(mainGroupName);
             main = NetworkServerGroup.getInstance(mainGroupName);
         }
         update();

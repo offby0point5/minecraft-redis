@@ -5,6 +5,7 @@ import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class NetworkSinglePlayer {
@@ -26,6 +27,7 @@ public class NetworkSinglePlayer {
 
 
     private NetworkSinglePlayer(UUID playerUuid) {
+        Objects.requireNonNull(playerUuid);
         SERVER = String.format("%s:%s:server", PREFIX, playerUuid);
         GROUP = String.format("%s:%s:group", PREFIX, playerUuid);
 
@@ -53,6 +55,7 @@ public class NetworkSinglePlayer {
     }
 
     protected void setServer(NetworkSingleServer server) {
+        Objects.requireNonNull(server);
         try (Jedis jedis = NetRedis.getJedis()) {
             this.server = server;
             jedis.set(SERVER, server.getName());

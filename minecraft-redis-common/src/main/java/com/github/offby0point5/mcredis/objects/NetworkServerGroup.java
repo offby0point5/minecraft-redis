@@ -7,10 +7,7 @@ import com.github.offby0point5.mcredis.rules.ServerGroupJoinRule;
 import com.github.offby0point5.mcredis.rules.ServerGroupKickRule;
 import redis.clients.jedis.Jedis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class NetworkServerGroup {
     private static final String PREFIX = String.format("%S:server-group", NetRedis.NETWORK_PREFIX);
@@ -30,6 +27,7 @@ public class NetworkServerGroup {
     private final String MEMBERS;
 
     private NetworkServerGroup(String groupName) {
+        Objects.requireNonNull(groupName);
         String JOIN_RULE = String.format("%s:%s:join-rule", PREFIX, groupName);
         String KICK_RULE = String.format("%s:%s:kick-rule", PREFIX, groupName);
         MEMBERS = String.format("%s:%s:members", PREFIX, groupName);
@@ -38,9 +36,11 @@ public class NetworkServerGroup {
         name = groupName;
         try (Jedis jedis = NetRedis.getJedis()) {
             String joinRuleName = jedis.get(JOIN_RULE);
+            Objects.requireNonNull(joinRuleName);
             joinRule = JoinRules.valueOf(joinRuleName);
 
             String kickRuleName = jedis.get(KICK_RULE);
+            Objects.requireNonNull(kickRuleName);
             kickRule = KickRules.valueOf(kickRuleName);
         }
         update();

@@ -3,8 +3,6 @@ package com.github.offby0point5.mcredis.objects;
 import com.github.offby0point5.mcredis.NetRedis;
 import com.github.offby0point5.mcredis.rules.JoinRules;
 import com.github.offby0point5.mcredis.rules.KickRules;
-import com.github.offby0point5.mcredis.rules.ServerGroupJoinRule;
-import com.github.offby0point5.mcredis.rules.ServerGroupKickRule;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
@@ -19,9 +17,26 @@ public class NetworkServerGroup {
         else return new NetworkServerGroup(groupName);
     }
 
+    public static NetworkServerGroup createAndGetInstance(String groupName,
+                                                          JoinRules groupJoinRule,
+                                                          KickRules groupKickRule) {
+        Objects.requireNonNull(groupName);
+        try (Jedis jedis = NetRedis.getJedis()) {
+            if (!jedis.keys(String.format("%s:%s", PREFIX, groupName)).isEmpty()) {
+                throw new IllegalStateException("This group already exists.");
+            }
+            Objects.requireNonNull(groupJoinRule);
+            Objects.requireNonNull(groupKickRule);
+
+            jedis.set(String.format("%s:%s:join-rule", PREFIX, groupName), groupJoinRule.name());
+            jedis.set(String.format("%s:%s:kick-rule", PREFIX, groupName), groupKickRule.name());
+        }
+        return new NetworkServerGroup(groupName);
+    }
+
     private final String name;
-    private final ServerGroupJoinRule joinRule;
-    private final ServerGroupKickRule kickRule;
+    private final JoinRules joinRule;
+    private final KickRules kickRule;
     private Set<NetworkSingleServer> members;
 
     private final String MEMBERS;
@@ -60,11 +75,11 @@ public class NetworkServerGroup {
         return name;
     }
 
-    public ServerGroupJoinRule getJoinRule() {
+    public JoinRules getJoinRule() {
         return joinRule;
     }
 
-    public ServerGroupKickRule getKickRule() {
+    public KickRules getKickRule() {
         return kickRule;
     }
 

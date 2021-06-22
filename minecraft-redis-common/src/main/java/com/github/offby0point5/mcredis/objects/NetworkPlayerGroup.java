@@ -15,9 +15,24 @@ public class NetworkPlayerGroup {
         else return new NetworkPlayerGroup(groupID);
     }
 
+    public static NetworkPlayerGroup createAndGetInstance(NetworkSinglePlayer leader) {
+        Objects.requireNonNull(leader);
+        if (leader.getPlayerGroup() != null) {
+            throw new IllegalStateException("Leader is already in a group!");
+        }
+        UUID groupID = UUID.randomUUID();
+        // create some keys
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.set(String.format("%s:%s:leader", PREFIX, groupID), leader.getUuid().toString());
+            // members are read as empty if key doesn't exist
+        }
+        return new NetworkPlayerGroup(groupID);
+    }
+
     private final UUID uuid;
     private NetworkSinglePlayer leader; // TODO: 22.06.21 use a LeaderPlayer extending a PartiedPlayer
     private Set<NetworkSinglePlayer> members; // TODO: 22.06.21 use a PartiedPlayer extending a NetworkSinglePlayer
+    // TODO: 22.06.21 add group invite and join
 
     private final String LEADER;
     private final String MEMBERS;

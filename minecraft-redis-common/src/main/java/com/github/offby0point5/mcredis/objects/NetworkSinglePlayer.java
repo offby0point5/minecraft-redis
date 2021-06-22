@@ -18,6 +18,15 @@ public class NetworkSinglePlayer {
         else return new NetworkSinglePlayer(playerUUID);
     }
 
+    public static NetworkSinglePlayer createAndGetInstance(UUID playerID) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            if (!jedis.keys(String.format("%s:%s", PREFIX, playerID)).isEmpty()) {
+                throw new IllegalStateException("This player already exists.");
+            }
+        }
+        return getInstance(playerID);
+    }
+
     private final UUID uuid;
     private NetworkSingleServer server;
     private NetworkPlayerGroup playerGroup;

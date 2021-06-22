@@ -16,6 +16,26 @@ public class NetworkSingleServer {
         else return new NetworkSingleServer(serverName);
     }
 
+    public static NetworkSingleServer createAndGetInstance(String serverName,
+                                                           InetSocketAddress serverAddress,
+                                                           NetworkServerGroup serverMainGroup,
+                                                           ServerStatus serverStatus) {
+        Objects.requireNonNull(serverName);
+        try (Jedis jedis = NetRedis.getJedis()) {
+            if (!jedis.keys(String.format("%s:%s", PREFIX, serverName)).isEmpty()) {
+                throw new IllegalStateException("This server already exists.");
+            }
+            Objects.requireNonNull(serverAddress);
+            Objects.requireNonNull(serverMainGroup);
+            Objects.requireNonNull(serverStatus);
+
+            jedis.set(String.format("%s:%s:address", PREFIX, serverName), serverAddress.toString());
+            jedis.set(String.format("%s:%s:main", PREFIX, serverName), serverMainGroup.getName());
+            jedis.set(String.format("%s:%s:status", PREFIX, serverName), serverStatus.name());
+        }
+        return new NetworkSingleServer(serverName);
+    }
+
     private final String name;
     private final InetSocketAddress address;
     private final NetworkServerGroup main;

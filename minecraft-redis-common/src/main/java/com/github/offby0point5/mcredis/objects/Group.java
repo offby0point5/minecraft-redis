@@ -4,33 +4,32 @@ import com.github.offby0point5.mcredis.NetRedis;
 import com.github.offby0point5.mcredis.rules.JoinRules;
 import com.github.offby0point5.mcredis.rules.KickRules;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class Group {
     private static final String PREFIX = String.format("%S:server-group", NetRedis.NETWORK_PREFIX);
 
-    private static final Map<String, Group> groups = new HashMap<>();
-
-    public static Group getInstance(String groupName) {
-        if (groups.containsKey(groupName)) return groups.get(groupName);
-        else return new Group(groupName);
-    }
-
     private final String name;
     private final JoinRules joinRule;
     private final KickRules kickRule;
 
-    private Group(String groupName) {
-        groups.put(groupName, this);
+    protected final String JOIN;
+    protected final String KICK;
+    protected final String MEMBERS;
+
+    public Group(String groupName) {
+        JOIN = String.format("%s:%s:join-rule", PREFIX, groupName);
+        KICK = String.format("%s:%s:kick-rule", PREFIX, groupName);
+        MEMBERS = String.format("%s:%s:members", PREFIX, groupName);
+
         name = groupName;
         try (Jedis jedis = NetRedis.getJedis()) {
-            String joinRuleName = jedis.get(String.format("%s:%s:join-rule", PREFIX, name));
+            String joinRuleName = jedis.get(JOIN);
             joinRule = JoinRules.valueOf(joinRuleName);
 
-            String kickRuleName = jedis.get(String.format("%s:%s:kick-rule", PREFIX, name));
+            String kickRuleName = jedis.get(KICK);
             kickRule = KickRules.valueOf(kickRuleName);
         }
     }
@@ -49,7 +48,22 @@ public class Group {
 
     public Set<String> getMembers() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            return jedis.smembers(String.format("%s:%s:members", PREFIX, name));
+            return jedis.smembers(MEMBERS);
+        }
+    }
+
+    public void delete() {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            Transaction transaction = jedis.multi();
+            for (String serverName : getMembers()) {
+                Server server = new Server(serverName);
+                transaction.srem(server.ALL_GROUPS, name);
+                if (server.getMain().equals(name)) transaction.set(server.MAIN_GROUP, "none");
+            }
+            transaction.del(JOIN);
+            transaction.del(KICK);
+            transaction.del(MEMBERS);
+            transaction.exec();
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.offby0point5.mcredis.objects;
 
 import com.github.offby0point5.mcredis.NetRedis;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,7 +12,12 @@ public class Party {
 
     private final UUID uuid;
 
+    protected final String LEADER;
+    protected final String MEMBERS;
+
     public Party(UUID groupID) {
+        LEADER = String.format("%s:leader", PREFIX);
+        MEMBERS = String.format("%s:members", PREFIX);
         uuid = groupID;
     }
 
@@ -21,13 +27,28 @@ public class Party {
 
     public UUID getLeader() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            return UUID.fromString(jedis.get(String.format("%s:leader", PREFIX)));
+            return UUID.fromString(LEADER);
         }
     }
 
     public Set<UUID> getMembers() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            return jedis.smembers(String.format("%s:members", PREFIX)).stream().map(UUID::fromString).collect(Collectors.toSet());
+            return jedis.smembers(MEMBERS).stream().map(UUID::fromString).collect(Collectors.toSet());
+        }
+    }
+
+    public void delete() {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            Transaction transaction = jedis.multi();
+            for (UUID playerId : getMembers()) {
+                Player player = new Player(playerId);
+                transaction.del(player.PARTY);
+            }
+            Player player = new Player(getLeader());
+            transaction.del(player.PARTY);
+            transaction.del(LEADER);
+            transaction.del(MEMBERS);
+            transaction.exec();
         }
     }
 }

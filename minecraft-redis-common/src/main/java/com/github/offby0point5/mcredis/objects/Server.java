@@ -12,7 +12,6 @@ public class Server {
     private static final String PREFIX = String.format("%S:server", NetRedis.NETWORK_PREFIX);
 
     private final String name;
-    private final InetSocketAddress address;
 
     protected final String ADDRESS;
     protected final String STATUS;
@@ -27,10 +26,6 @@ public class Server {
         ALL_GROUPS = String.format("%s:%s:groups", PREFIX, serverName);
         PLAYERS = String.format("%s:%s:players", PREFIX, serverName);
         name = serverName;
-        try (Jedis jedis = NetRedis.getJedis()) {
-            String[] inetAddr = jedis.get(ADDRESS).split("\\n");
-            address = new InetSocketAddress(inetAddr[0], Integer.parseInt(inetAddr[1]));
-        }
     }
 
     public String getName() {
@@ -38,12 +33,27 @@ public class Server {
     }
 
     public InetSocketAddress getAddress() {
-        return address;
+        try (Jedis jedis = NetRedis.getJedis()) {
+            String[] inetAddr = jedis.get(ADDRESS).split("\\n");
+            return new InetSocketAddress(inetAddr[0], Integer.parseInt(inetAddr[1]));
+        }
+    }
+
+    public void setAddress(InetSocketAddress serverAddress) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.set(ADDRESS, String.format("%s:%d", serverAddress.getHostString(), serverAddress.getPort()));
+        }
     }
 
     public ServerOnlineStatus getStatus() {
         try (Jedis jedis = NetRedis.getJedis()){
             return ServerOnlineStatus.valueOf(jedis.get(STATUS));
+        }
+    }
+
+    public void setStatus(ServerOnlineStatus serverStatus) {
+        try (Jedis jedis = NetRedis.getJedis()){
+            jedis.set(STATUS, serverStatus.name());
         }
     }
 
@@ -53,9 +63,39 @@ public class Server {
         }
     }
 
+    public void setMain(String groupName) {
+        try (Jedis jedis = NetRedis.getJedis()){
+            jedis.set(MAIN_GROUP, groupName);
+        }
+    }
+
     public Set<String> getGroups() {
         try (Jedis jedis = NetRedis.getJedis()){
             return jedis.smembers(ALL_GROUPS);
+        }
+    }
+
+    public void addGroups(String... groupNames) {
+        try (Jedis jedis = NetRedis.getJedis()){
+            Transaction transaction = jedis.multi();
+            transaction.sadd(ALL_GROUPS, groupNames);
+            for (String groupName : groupNames) {
+                Group group = new Group(groupName);
+                transaction.sadd(group.MEMBERS, name);
+            }
+            transaction.exec();
+        }
+    }
+
+    public void remGroups(String... groupNames) {
+        try (Jedis jedis = NetRedis.getJedis()){
+            Transaction transaction = jedis.multi();
+            transaction.srem(ALL_GROUPS, groupNames);
+            for (String groupName : groupNames) {
+                Group group = new Group(groupName);
+                transaction.srem(group.MEMBERS, name);
+            }
+            transaction.exec();
         }
     }
 

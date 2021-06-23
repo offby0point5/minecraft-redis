@@ -58,4 +58,39 @@ public class Player {
             transaction.exec();
         }
     }
+
+    public void joinServer(String serverName) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            String currentServerName = getServer();
+            Transaction transaction = jedis.multi();
+            if (currentServerName != null) {
+                Server currentServer = new Server(currentServerName);
+                transaction.srem(currentServer.PLAYERS, uuid.toString());
+            }
+            transaction.set(SERVER, serverName);
+            Server newServer = new Server(currentServerName);
+            transaction.sadd(newServer.PLAYERS, uuid.toString());
+            transaction.exec();
+        }
+    }
+
+    public void joinParty(UUID partyId) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            Party party = new Party(partyId);
+            Transaction transaction = jedis.multi();
+            transaction.set(PARTY, partyId.toString());
+            transaction.sadd(party.MEMBERS, uuid.toString());
+            transaction.exec();
+        }
+    }
+
+    public void leaveParty(UUID partyId) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            Party party = new Party(partyId);
+            Transaction transaction = jedis.multi();
+            transaction.del(PARTY);
+            transaction.srem(party.MEMBERS, uuid.toString());
+            transaction.exec();
+        }
+    }
 }

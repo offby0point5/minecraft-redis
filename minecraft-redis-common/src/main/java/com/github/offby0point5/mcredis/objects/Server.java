@@ -34,7 +34,9 @@ public class Server {
 
     public InetSocketAddress getAddress() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            String[] inetAddr = jedis.get(ADDRESS).split("\\n");
+            String rawAddress = jedis.get(ADDRESS);
+            if (rawAddress == null) return null;
+            String[] inetAddr = rawAddress.split(":");
             return new InetSocketAddress(inetAddr[0], Integer.parseInt(inetAddr[1]));
         }
     }
@@ -47,7 +49,9 @@ public class Server {
 
     public ServerOnlineStatus getStatus() {
         try (Jedis jedis = NetRedis.getJedis()){
-            return ServerOnlineStatus.valueOf(jedis.get(STATUS));
+            String statueName = jedis.get(STATUS);
+            if (statueName == null) return null;
+            return ServerOnlineStatus.valueOf(statueName);
         }
     }
 

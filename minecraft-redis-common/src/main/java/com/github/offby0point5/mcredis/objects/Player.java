@@ -45,7 +45,7 @@ public class Player {
             Transaction transaction = jedis.multi();
             if (serverName != null) {
                 Server server = new Server(getServer());
-                transaction.srem(server.PLAYERS, partyId.toString());
+                transaction.srem(server.PLAYERS, uuid.toString());
             }
 
             if (partyId != null) {

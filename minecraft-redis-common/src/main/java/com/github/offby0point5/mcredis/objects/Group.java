@@ -12,8 +12,6 @@ public class Group {
     private static final String PREFIX = String.format("%s:server-group", NetRedis.NETWORK_PREFIX);
 
     private final String name;
-    private final JoinRules joinRule;
-    private final KickRules kickRule;
 
     protected final String JOIN;
     protected final String KICK;
@@ -25,13 +23,6 @@ public class Group {
         MEMBERS = String.format("%s:%s:members", PREFIX, groupName);
 
         name = groupName;
-        try (Jedis jedis = NetRedis.getJedis()) {
-            String joinRuleName = jedis.get(JOIN);
-            joinRule = JoinRules.valueOf(joinRuleName);
-
-            String kickRuleName = jedis.get(KICK);
-            kickRule = KickRules.valueOf(kickRuleName);
-        }
     }
 
     public String getName() {
@@ -39,11 +30,31 @@ public class Group {
     }
 
     public JoinRules getJoinRule() {
-        return joinRule;
+        try (Jedis jedis = NetRedis.getJedis()) {
+            String joinRuleName = jedis.get(JOIN);
+            if (joinRuleName == null) return null;
+            return JoinRules.valueOf(joinRuleName);
+        }
+    }
+
+    public void setJoinRule(JoinRules joinRule) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.set(JOIN, joinRule.name());
+        }
     }
 
     public KickRules getKickRule() {
-        return kickRule;
+        try (Jedis jedis = NetRedis.getJedis()) {
+            String kickRuleName = jedis.get(KICK);
+            if (kickRuleName == null) return null;
+            return KickRules.valueOf(kickRuleName);
+        }
+    }
+
+    public void setKickRule(KickRules kickRule) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.set(KICK, kickRule.name());
+        }
     }
 
     public Set<String> getMembers() {

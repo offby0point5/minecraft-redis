@@ -4,7 +4,7 @@ import com.github.offby0point5.mcredis.objects.NetworkServerGroup;
 import com.github.offby0point5.mcredis.objects.NetworkSinglePlayer;
 import com.github.offby0point5.mcredis.objects.NetworkSingleServer;
 
-public enum JoinRules implements ServerGroupJoinRule {
+public enum JoinRules {
     NONE(((player, groupJoined) -> null))
     ;
 
@@ -14,8 +14,11 @@ public enum JoinRules implements ServerGroupJoinRule {
         rule = joinRule;
     }
 
-    @Override
     public NetworkSingleServer getJoinServer(NetworkSinglePlayer player, NetworkServerGroup groupJoined) {
         return null;
+    }
+
+    private interface ServerGroupJoinRule {
+        NetworkSingleServer getJoinServer(NetworkSinglePlayer player, NetworkServerGroup groupJoined);
     }
 }

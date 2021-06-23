@@ -9,7 +9,7 @@ import redis.clients.jedis.Transaction;
 import java.util.Set;
 
 public class Group {
-    private static final String PREFIX = String.format("%S:server-group", NetRedis.NETWORK_PREFIX);
+    private static final String PREFIX = String.format("%s:server-group", NetRedis.NETWORK_PREFIX);
 
     private final String name;
     private final JoinRules joinRule;

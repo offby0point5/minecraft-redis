@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Server {
-    private static final String PREFIX = String.format("%S:server", NetRedis.NETWORK_PREFIX);
+    private static final String PREFIX = String.format("%s:server", NetRedis.NETWORK_PREFIX);
 
     private final String name;
 

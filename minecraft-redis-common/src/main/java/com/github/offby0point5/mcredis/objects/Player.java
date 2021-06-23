@@ -32,7 +32,9 @@ public class Player {
 
     public UUID getParty() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            return UUID.fromString(jedis.get(PARTY));
+            String partyUUID = jedis.get(PARTY);
+            if (partyUUID == null) return null;
+            return UUID.fromString(partyUUID);
         }
     }
 

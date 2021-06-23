@@ -27,7 +27,9 @@ public class Party {
 
     public UUID getLeader() {
         try (Jedis jedis = NetRedis.getJedis()) {
-            return UUID.fromString(LEADER);
+            String leaderUUID = jedis.get(LEADER);
+            if (leaderUUID == null) return null;
+            return UUID.fromString(leaderUUID);
         }
     }
 

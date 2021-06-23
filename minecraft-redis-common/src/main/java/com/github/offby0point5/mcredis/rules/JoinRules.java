@@ -15,7 +15,7 @@ public enum JoinRules {
     }
 
     public Server getJoinServer(Player player, Group groupJoined) {
-        return null;
+        return rule.getJoinServer(player, groupJoined);
     }
 
     private interface ServerGroupJoinRule {

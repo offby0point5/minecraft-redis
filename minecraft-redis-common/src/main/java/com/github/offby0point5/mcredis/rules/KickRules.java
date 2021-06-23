@@ -1,8 +1,8 @@
 package com.github.offby0point5.mcredis.rules;
 
-import com.github.offby0point5.mcredis.objects.NetworkServerGroup;
-import com.github.offby0point5.mcredis.objects.NetworkSinglePlayer;
-import com.github.offby0point5.mcredis.objects.NetworkSingleServer;
+import com.github.offby0point5.mcredis.objects.Group;
+import com.github.offby0point5.mcredis.objects.Player;
+import com.github.offby0point5.mcredis.objects.Server;
 
 public enum KickRules {
     NONE((player, kickedFrom) -> null),
@@ -14,11 +14,11 @@ public enum KickRules {
         rule = kickRule;
     }
 
-    public NetworkServerGroup getNewGroup(NetworkSinglePlayer player, NetworkSingleServer kickedFrom) {
+    public Group getNewGroup(Player player, Server kickedFrom) {
         return rule.getNewGroup(player, kickedFrom);
     }
 
     interface ServerGroupKickRule {
-        NetworkServerGroup getNewGroup(NetworkSinglePlayer player, NetworkSingleServer kickedFrom);
+        Group getNewGroup(Player player, Server kickedFrom);
     }
 }

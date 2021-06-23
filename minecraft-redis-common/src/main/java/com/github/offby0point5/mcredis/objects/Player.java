@@ -5,12 +5,12 @@ import redis.clients.jedis.Jedis;
 
 import java.util.UUID;
 
-public class NetworkSinglePlayer {
+public class Player {
     private static final String PREFIX = String.format("%S:player", NetRedis.NETWORK_PREFIX);
 
     private final UUID uuid;
 
-    private NetworkSinglePlayer(UUID playerUuid) {
+    private Player(UUID playerUuid) {
         this.uuid = playerUuid;
     }
 

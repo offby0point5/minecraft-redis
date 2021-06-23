@@ -6,12 +6,12 @@ import redis.clients.jedis.Jedis;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NetworkPlayerGroup {
+public class Party {
     private static final String PREFIX = String.format("%S:player-group", NetRedis.NETWORK_PREFIX);
 
     private final UUID uuid;
 
-    public NetworkPlayerGroup(UUID groupID) {
+    public Party(UUID groupID) {
         uuid = groupID;
     }
 

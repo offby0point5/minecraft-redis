@@ -7,13 +7,13 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NetworkSingleServer {
+public class Server {
     private static final String PREFIX = String.format("%S:server", NetRedis.NETWORK_PREFIX);
 
     private final String name;
     private final InetSocketAddress address;
 
-    private NetworkSingleServer(String serverName) {
+    private Server(String serverName) {
         name = serverName;
         try (Jedis jedis = NetRedis.getJedis()) {
             String[] inetAddr = jedis.get(String.format("%s:%s:address", PREFIX, name)).split("\\n");

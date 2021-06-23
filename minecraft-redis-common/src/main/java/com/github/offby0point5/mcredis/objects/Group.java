@@ -9,21 +9,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class NetworkServerGroup {
+public class Group {
     private static final String PREFIX = String.format("%S:server-group", NetRedis.NETWORK_PREFIX);
 
-    private static final Map<String, NetworkServerGroup> groups = new HashMap<>();
+    private static final Map<String, Group> groups = new HashMap<>();
 
-    public static NetworkServerGroup getInstance(String groupName) {
+    public static Group getInstance(String groupName) {
         if (groups.containsKey(groupName)) return groups.get(groupName);
-        else return new NetworkServerGroup(groupName);
+        else return new Group(groupName);
     }
 
     private final String name;
     private final JoinRules joinRule;
     private final KickRules kickRule;
 
-    private NetworkServerGroup(String groupName) {
+    private Group(String groupName) {
         groups.put(groupName, this);
         name = groupName;
         try (Jedis jedis = NetRedis.getJedis()) {

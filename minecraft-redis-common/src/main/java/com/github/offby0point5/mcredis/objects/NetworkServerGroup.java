@@ -3,12 +3,9 @@ package com.github.offby0point5.mcredis.objects;
 import com.github.offby0point5.mcredis.NetRedis;
 import com.github.offby0point5.mcredis.rules.JoinRules;
 import com.github.offby0point5.mcredis.rules.KickRules;
-import com.github.offby0point5.mcredis.rules.ServerGroupJoinRule;
-import com.github.offby0point5.mcredis.rules.ServerGroupKickRule;
 import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,9 +20,8 @@ public class NetworkServerGroup {
     }
 
     private final String name;
-    private final ServerGroupJoinRule joinRule;
-    private final ServerGroupKickRule kickRule;
-    private Set<NetworkSingleServer> members;
+    private final JoinRules joinRule;
+    private final KickRules kickRule;
 
     private NetworkServerGroup(String groupName) {
         groups.put(groupName, this);
@@ -37,32 +33,23 @@ public class NetworkServerGroup {
             String kickRuleName = jedis.get(String.format("%s:%s:kick-rule", PREFIX, name));
             kickRule = KickRules.valueOf(kickRuleName);
         }
-        update();
-    }
-
-    public void update() {
-        try (Jedis jedis = NetRedis.getJedis()) {
-            Set<String> memberNames = jedis.smembers(String.format("%s:%s:members", PREFIX, name));
-            members = new HashSet<>();
-            for (String memberName : memberNames) {
-                members.add(NetworkSingleServer.getInstance(memberName));
-            }
-        }
     }
 
     public String getName() {
         return name;
     }
 
-    public ServerGroupJoinRule getJoinRule() {
+    public JoinRules getJoinRule() {
         return joinRule;
     }
 
-    public ServerGroupKickRule getKickRule() {
+    public KickRules getKickRule() {
         return kickRule;
     }
 
-    public Set<NetworkSingleServer> getMembers() {
-        return members;
+    public Set<String> getMembers() {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            return jedis.smembers(String.format("%s:%s:members", PREFIX, name));
+        }
     }
 }

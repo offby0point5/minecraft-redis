@@ -1,6 +1,7 @@
 package com.github.offby0point5.mcredis.objects;
 
 import com.github.offby0point5.mcredis.NetRedis;
+import com.github.offby0point5.mcredis.datatype.ItemStack;
 import com.github.offby0point5.mcredis.rules.JoinRules;
 import com.github.offby0point5.mcredis.rules.KickRules;
 import redis.clients.jedis.Jedis;
@@ -16,11 +17,13 @@ public class Group {
     protected final String JOIN;
     protected final String KICK;
     protected final String MEMBERS;
+    protected final String ITEM;
 
     public Group(String groupName) {
         JOIN = String.format("%s:%s:join-rule", PREFIX, groupName);
         KICK = String.format("%s:%s:kick-rule", PREFIX, groupName);
         MEMBERS = String.format("%s:%s:members", PREFIX, groupName);
+        ITEM = String.format("%s:%s:item", PREFIX, groupName);
 
         name = groupName;
     }
@@ -54,6 +57,19 @@ public class Group {
     public void setKickRule(KickRules kickRule) {
         try (Jedis jedis = NetRedis.getJedis()) {
             jedis.set(KICK, kickRule.name());
+        }
+    }
+
+    public ItemStack getItem() {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            String itemSerialized = jedis.get(ITEM);
+            return ItemStack.deserialize(itemSerialized);
+        }
+    }
+
+    public void setItem(ItemStack itemStack) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.set(ITEM, itemStack.serialize());
         }
     }
 

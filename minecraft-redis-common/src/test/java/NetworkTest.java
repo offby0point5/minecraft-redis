@@ -1,4 +1,5 @@
 import com.github.offby0point5.mcredis.NetRedis;
+import com.github.offby0point5.mcredis.datatype.ItemStack;
 import com.github.offby0point5.mcredis.objects.Group;
 import com.github.offby0point5.mcredis.objects.Party;
 import com.github.offby0point5.mcredis.objects.Player;
@@ -10,9 +11,9 @@ import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 
-import java.awt.image.Kernel;
 import java.net.InetSocketAddress;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class NetworkTest {
     }
 
     @Test
-    public void createServer() {
+    public void checkServer() {
         Server lobby = new Server(serverName);
         lobby.delete();
         assertNull(lobby.getAddress());
@@ -64,7 +65,7 @@ public class NetworkTest {
     }
 
     @Test
-    public void createPlayer() {
+    public void checkPlayer() {
         Player player = new Player(playerUUID);
         player.delete();
         assertNull(player.getServer());
@@ -79,7 +80,7 @@ public class NetworkTest {
     }
 
     @Test
-    public void createParty() {
+    public void checkParty() {
         Party party = new Party(partyUUID);
         party.delete();
         assertNull(party.getLeader());
@@ -87,11 +88,12 @@ public class NetworkTest {
     }
 
     @Test
-    public void createGroup() {
+    public void checkGroup() {
         Group group = new Group("lobby");
         group.delete();
         assertNull(group.getKickRule());
         assertNull(group.getJoinRule());
+        assertNull(group.getItem());
         assertEquals(Collections.emptySet(), group.getMembers());
 
         group.setJoinRule(JoinRules.NONE);
@@ -99,5 +101,25 @@ public class NetworkTest {
 
         group.setKickRule(KickRules.NONE);
         assertEquals(KickRules.NONE, group.getKickRule());
+    }
+
+    @Test
+    public void checkGroupItem() {
+        Group group = new Group("random");
+        group.delete();
+
+        ItemStack itemStack = new ItemStack.Builder("BARRIER", "ITEM for test...")
+                .amount(2)
+                .glowing(true)
+                .lore(List.of("Line1", "Line2"))
+                .build();
+
+        String item = itemStack.serialize();
+        System.out.println(item);
+        assertEquals(item, ItemStack.deserialize(item).serialize());
+        assertEquals(itemStack, ItemStack.deserialize(item));
+
+        group.setItem(itemStack);
+        assertEquals(itemStack, group.getItem());
     }
 }

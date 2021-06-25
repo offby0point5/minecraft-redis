@@ -17,8 +17,10 @@ import java.util.UUID;
 public class Manager {
     private static final Set<ServerGroup> groups = new HashSet<>();
 
-    public static void setup() {
-        // TODO: 25.06.21 implement proxy network manager setup
+    private static GetPlayersCallback playersCallback;
+
+    public static void setup(GetPlayersCallback getPlayersCallback) {
+        playersCallback = getPlayersCallback;
     }
 
     public static String getJoinServer(UUID playerID, String groupName) {
@@ -58,5 +60,9 @@ public class Manager {
 
     public static void shutdown() {
         // TODO: 25.06.21 implement proxy network manager shutdown
+    }
+
+    public interface GetPlayersCallback {
+        Set<UUID> run();
     }
 }

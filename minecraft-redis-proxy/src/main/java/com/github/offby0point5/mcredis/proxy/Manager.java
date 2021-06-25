@@ -47,15 +47,18 @@ public class Manager {
     public static void sendPlayer(UUID playerID, String serverName) {
         Objects.requireNonNull(playerID);
         Objects.requireNonNull(serverName);
-        Player player = new Player(playerID);
-        player.joinServer(serverName);
+        new Player(playerID).joinServer(serverName);
+    }
+
+    public static void disconnectPlayer(UUID playerID) {
+        Objects.requireNonNull(playerID);
+        new Player(playerID).delete();
     }
 
     public static void joinParty(UUID playerID, UUID partyID) {
         Objects.requireNonNull(playerID);
         Objects.requireNonNull(partyID);
-        Player player = new Player(playerID);
-        player.joinParty(partyID);
+        new Player(playerID).joinParty(partyID);
     }
 
     public static void shutdown() {

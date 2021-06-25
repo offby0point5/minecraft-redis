@@ -1,7 +1,6 @@
 package com.github.offby0point5.mcredis.proxy;
 
 import com.github.offby0point5.mcredis.Group;
-import com.github.offby0point5.mcredis.Network;
 import com.github.offby0point5.mcredis.Player;
 import com.github.offby0point5.mcredis.Server;
 import com.github.offby0point5.mcredis.rules.JoinRules;
@@ -41,6 +40,20 @@ public class Manager {
         KickRules kickRule = mainGroup.getKickRule();
         if (kickRule == null) return null;
         return kickRule.getNewGroup(new Player(playerID), new Server(serverName)).getName();
+    }
+
+    public static void sendPlayer(UUID playerID, String serverName) {
+        Objects.requireNonNull(playerID);
+        Objects.requireNonNull(serverName);
+        Player player = new Player(playerID);
+        player.joinServer(serverName);
+    }
+
+    public static void joinParty(UUID playerID, UUID partyID) {
+        Objects.requireNonNull(playerID);
+        Objects.requireNonNull(partyID);
+        Player player = new Player(playerID);
+        player.joinParty(partyID);
     }
 
     public static void shutdown() {

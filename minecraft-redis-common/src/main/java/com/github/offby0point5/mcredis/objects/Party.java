@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Party {
-    private static final String PREFIX = String.format("%s:player-group", NetRedis.NETWORK_PREFIX);
+    protected static final String PREFIX = String.format("%s:player-group", NetRedis.NETWORK_PREFIX);
 
     private final UUID uuid;
 

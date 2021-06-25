@@ -7,7 +7,7 @@ import redis.clients.jedis.Transaction;
 import java.util.UUID;
 
 public class Player {
-    private static final String PREFIX = String.format("%s:player", NetRedis.NETWORK_PREFIX);
+    protected static final String PREFIX = String.format("%s:player", NetRedis.NETWORK_PREFIX);
 
     private final UUID uuid;
 

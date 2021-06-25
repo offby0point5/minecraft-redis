@@ -69,7 +69,15 @@ public class Server {
 
     public void setMain(String groupName) {
         try (Jedis jedis = NetRedis.getJedis()){
-            jedis.set(MAIN_GROUP, groupName);
+            Transaction transaction = jedis.multi();
+            transaction.set(MAIN_GROUP, groupName);
+
+            Group oldGroup = new Group(getMain());
+            transaction.srem(oldGroup.MEMBERS, name);
+
+            Group newGroup = new Group(groupName);
+            transaction.sadd(newGroup.MEMBERS, name);
+            transaction.exec();
         }
     }
 
@@ -131,7 +139,7 @@ public class Server {
         }
     }
 
-    private enum ServerOnlineStatus {
+    public enum ServerOnlineStatus {
         ONLINE,
         SOFT_FULL,
         HARD_FULL

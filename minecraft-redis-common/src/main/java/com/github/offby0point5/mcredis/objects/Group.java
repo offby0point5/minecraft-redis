@@ -46,6 +46,12 @@ public class Group {
         }
     }
 
+    public void defaultJoinRule(JoinRules joinRule) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.setnx(JOIN, joinRule.name());
+        }
+    }
+
     public KickRules getKickRule() {
         try (Jedis jedis = NetRedis.getJedis()) {
             String kickRuleName = jedis.get(KICK);
@@ -60,6 +66,12 @@ public class Group {
         }
     }
 
+    public void defaultKickRule(KickRules kickRule) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.setnx(KICK, kickRule.name());
+        }
+    }
+
     public ItemStack getItem() {
         try (Jedis jedis = NetRedis.getJedis()) {
             String itemSerialized = jedis.get(ITEM);
@@ -70,6 +82,12 @@ public class Group {
     public void setItem(ItemStack itemStack) {
         try (Jedis jedis = NetRedis.getJedis()) {
             jedis.set(ITEM, itemStack.serialize());
+        }
+    }
+
+    public void defaultItem(ItemStack itemStack) {
+        try (Jedis jedis = NetRedis.getJedis()) {
+            jedis.setnx(ITEM, itemStack.serialize());
         }
     }
 

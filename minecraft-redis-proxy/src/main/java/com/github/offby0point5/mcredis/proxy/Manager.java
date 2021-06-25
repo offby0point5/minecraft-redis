@@ -59,7 +59,10 @@ public class Manager {
     }
 
     public static void shutdown() {
-        // TODO: 25.06.21 implement proxy network manager shutdown
+        Set<UUID> players = playersCallback.run();
+        for (UUID playerID : players) {
+            new Player(playerID).delete();
+        }
     }
 
     public interface GetPlayersCallback {

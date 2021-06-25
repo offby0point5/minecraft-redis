@@ -66,7 +66,7 @@ public class MinecraftRedisVelocity {
             return;
         }
         event.setInitialServer(optionalRegisteredServer.get());
-        new com.github.offby0point5.mcredis.Player(event.getPlayer().getUniqueId()).joinServer(serverName);
+        Manager.sendPlayer(event.getPlayer().getUniqueId(), serverName);
     }
 
     @Subscribe
@@ -88,7 +88,7 @@ public class MinecraftRedisVelocity {
                         "This group sent you to a server that does not exist!", NamedTextColor.RED));
                 else {
                     player.createConnectionRequest(optionalRegisteredServer.get()).fireAndForget();
-                    new com.github.offby0point5.mcredis.Player(player.getUniqueId()).joinServer(serverName);
+                    Manager.sendPlayer(player.getUniqueId(), serverName);
                 }
             }
 
@@ -101,7 +101,7 @@ public class MinecraftRedisVelocity {
                     "This server does not exist!", NamedTextColor.RED));
             else {
                 player.createConnectionRequest(optionalRegisteredServer.get()).fireAndForget();
-                new com.github.offby0point5.mcredis.Player(player.getUniqueId()).joinServer(serverName);
+                Manager.sendPlayer(player.getUniqueId(), serverName);
             }
 
             event.setResult(PluginMessageEvent.ForwardResult.handled());
@@ -147,6 +147,6 @@ public class MinecraftRedisVelocity {
         }
         event.setResult(KickedFromServerEvent.RedirectPlayer.create(optionalRegisteredServer.get(),
                 Component.text("You were connected to a new server.", NamedTextColor.GREEN)));
-        new com.github.offby0point5.mcredis.Player(event.getPlayer().getUniqueId()).joinServer(serverName);
+        Manager.sendPlayer(player.getUniqueId(), serverName);
     }
 }

@@ -73,6 +73,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -131,5 +135,12 @@
 
     <repositories><repository><id>velocitypowered-repo</id><url>https://repo.velocitypowered.com/releases/</url></repository><repository><id>minecraft-libraries</id><url>https://libraries.minecraft.net/</url></repository><repository><id>spongepowered-repo</id><url>https://repo.spongepowered.org/maven</url></repository></repositories>
 
-    <dependencies><dependency><groupId>com.velocitypowered</groupId><artifactId>velocity-api</artifactId><version>3.0.0-SNAPSHOT</version><scope>provided</scope></dependency><dependency><groupId>com.github.offby0point5</groupId><artifactId>minecraft-redis-common</artifactId><version>${project.version}</version><scope>compile</scope></dependency></dependencies>
+    <dependencies><dependency><groupId>com.velocitypowered</groupId><artifactId>velocity-api</artifactId><version>3.0.0-SNAPSHOT</version><scope>provided</scope></dependency><dependency><groupId>com.github.offby0point5</groupId><artifactId>minecraft-redis-common</artifactId><version>${project.version}</version><scope>compile</scope></dependency>
+        <dependency>
+            <groupId>com.github.offby0point5</groupId>
+            <artifactId>minecraft-redis-proxy</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>

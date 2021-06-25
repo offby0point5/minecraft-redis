@@ -1,13 +1,13 @@
-package com.github.offby0point5.mcredis.objects;
+package com.github.offby0point5.mcredis;
 
-import com.github.offby0point5.mcredis.NetRedis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Player {
-    protected static final String PREFIX = String.format("%s:player", NetRedis.NETWORK_PREFIX);
+    protected static final String PREFIX = String.format("%s:player", Network.NETWORK_PREFIX);
 
     private final UUID uuid;
 
@@ -15,6 +15,7 @@ public class Player {
     protected final String PARTY;
 
     public Player(UUID playerUuid) {
+        Objects.requireNonNull(playerUuid);
         SERVER = String.format("%s:%s:server", PREFIX, playerUuid);
         PARTY = String.format("%s:%s:party", PREFIX, playerUuid);
         this.uuid = playerUuid;
@@ -25,13 +26,13 @@ public class Player {
     }
 
     public String getServer() {
-        try (Jedis jedis = NetRedis.getJedis()) {
+        try (Jedis jedis = Network.getJedis()) {
             return jedis.get(SERVER);
         }
     }
 
     public UUID getParty() {
-        try (Jedis jedis = NetRedis.getJedis()) {
+        try (Jedis jedis = Network.getJedis()) {
             String partyUUID = jedis.get(PARTY);
             if (partyUUID == null) return null;
             return UUID.fromString(partyUUID);
@@ -41,7 +42,7 @@ public class Player {
     public void delete() {
         String serverName = getServer();
         UUID partyId = getParty();
-        try (Jedis jedis = NetRedis.getJedis()) {
+        try (Jedis jedis = Network.getJedis()) {
             Transaction transaction = jedis.multi();
             if (serverName != null) {
                 Server server = new Server(getServer());
@@ -62,7 +63,7 @@ public class Player {
     }
 
     public void joinServer(String serverName) {
-        try (Jedis jedis = NetRedis.getJedis()) {
+        try (Jedis jedis = Network.getJedis()) {
             String currentServerName = getServer();
             Transaction transaction = jedis.multi();
             if (currentServerName != null) {
@@ -70,14 +71,14 @@ public class Player {
                 transaction.srem(currentServer.PLAYERS, uuid.toString());
             }
             transaction.set(SERVER, serverName);
-            Server newServer = new Server(currentServerName);
+            Server newServer = new Server(serverName);
             transaction.sadd(newServer.PLAYERS, uuid.toString());
             transaction.exec();
         }
     }
 
     public void joinParty(UUID partyId) {
-        try (Jedis jedis = NetRedis.getJedis()) {
+        try (Jedis jedis = Network.getJedis()) {
             Party party = new Party(partyId);
             Transaction transaction = jedis.multi();
             transaction.set(PARTY, partyId.toString());
@@ -87,7 +88,7 @@ public class Player {
     }
 
     public void leaveParty(UUID partyId) {
-        try (Jedis jedis = NetRedis.getJedis()) {
+        try (Jedis jedis = Network.getJedis()) {
             Party party = new Party(partyId);
             Transaction transaction = jedis.multi();
             transaction.del(PARTY);

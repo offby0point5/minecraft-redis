@@ -1,9 +1,9 @@
-import com.github.offby0point5.mcredis.NetRedis;
+import com.github.offby0point5.mcredis.Network;
 import com.github.offby0point5.mcredis.datatype.ItemStack;
-import com.github.offby0point5.mcredis.objects.Group;
-import com.github.offby0point5.mcredis.objects.Party;
-import com.github.offby0point5.mcredis.objects.Player;
-import com.github.offby0point5.mcredis.objects.Server;
+import com.github.offby0point5.mcredis.Group;
+import com.github.offby0point5.mcredis.Party;
+import com.github.offby0point5.mcredis.Player;
+import com.github.offby0point5.mcredis.Server;
 import com.github.offby0point5.mcredis.rules.JoinRules;
 import com.github.offby0point5.mcredis.rules.KickRules;
 import org.junit.AfterClass;
@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -28,8 +29,8 @@ public class NetworkTest {
     @AfterClass
     public static void cleanup() {
         System.out.println("Clean up.");
-        try (Jedis jedis = NetRedis.getJedis()) {
-            Set<String> keys = jedis.keys(String.format("%s:*", NetRedis.NETWORK_PREFIX));
+        try (Jedis jedis = Network.getJedis()) {
+            Set<String> keys = jedis.keys(String.format("%s:*", Network.NETWORK_PREFIX));
             Transaction transaction = jedis.multi();
             for (String key : keys)
                 transaction.del(key);
@@ -115,11 +116,27 @@ public class NetworkTest {
                 .build();
 
         String item = itemStack.serialize();
-        System.out.println(item);
         assertEquals(item, ItemStack.deserialize(item).serialize());
         assertEquals(itemStack, ItemStack.deserialize(item));
 
         group.setItem(itemStack);
         assertEquals(itemStack, group.getItem());
+    }
+
+    @Test
+    public void checkNetworkMethods() throws InterruptedException {
+        Server server = new Server("server");
+        server.setMain("group");
+        server.setAddress(new InetSocketAddress(25600));
+        Player player = new Player(playerUUID);
+        player.joinServer("server");
+        player.joinParty(partyUUID);
+
+        TimeUnit.SECONDS.sleep(2);
+        assertEquals(Set.of("group"), Network.getGroups());
+        assertEquals(Set.of("server"), Network.getServers());
+        assertEquals(Set.of(playerUUID), Network.getPlayers());
+        assertEquals(Set.of(partyUUID), Network.getParties());
+
     }
 }

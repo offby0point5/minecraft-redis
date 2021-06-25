@@ -1,8 +1,8 @@
 package com.github.offby0point5.mcredis.rules;
 
-import com.github.offby0point5.mcredis.objects.Group;
-import com.github.offby0point5.mcredis.objects.Player;
-import com.github.offby0point5.mcredis.objects.Server;
+import com.github.offby0point5.mcredis.Group;
+import com.github.offby0point5.mcredis.Player;
+import com.github.offby0point5.mcredis.Server;
 
 public enum JoinRules {
     NONE(((player, groupJoined) -> null))

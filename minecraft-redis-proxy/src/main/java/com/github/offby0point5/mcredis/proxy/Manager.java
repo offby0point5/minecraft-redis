@@ -17,8 +17,10 @@ import java.util.UUID;
 public class Manager {
     private static final Set<ServerGroup> groups = new HashSet<>();
 
-    public static void setup() {
-        // TODO: 25.06.21 implement proxy network manager setup
+    private static GetPlayersCallback playersCallback;
+
+    public static void setup(GetPlayersCallback getPlayersCallback) {
+        playersCallback = getPlayersCallback;
     }
 
     public static String getJoinServer(UUID playerID, String groupName) {
@@ -45,18 +47,28 @@ public class Manager {
     public static void sendPlayer(UUID playerID, String serverName) {
         Objects.requireNonNull(playerID);
         Objects.requireNonNull(serverName);
-        Player player = new Player(playerID);
-        player.joinServer(serverName);
+        new Player(playerID).joinServer(serverName);
+    }
+
+    public static void disconnectPlayer(UUID playerID) {
+        Objects.requireNonNull(playerID);
+        new Player(playerID).delete();
     }
 
     public static void joinParty(UUID playerID, UUID partyID) {
         Objects.requireNonNull(playerID);
         Objects.requireNonNull(partyID);
-        Player player = new Player(playerID);
-        player.joinParty(partyID);
+        new Player(playerID).joinParty(partyID);
     }
 
     public static void shutdown() {
-        // TODO: 25.06.21 implement proxy network manager shutdown
+        Set<UUID> players = playersCallback.run();
+        for (UUID playerID : players) {
+            new Player(playerID).delete();
+        }
+    }
+
+    public interface GetPlayersCallback {
+        Set<UUID> run();
     }
 }

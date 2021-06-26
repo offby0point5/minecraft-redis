@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Plugin(
         id = "minecraft-redis-velocity",
@@ -43,7 +44,7 @@ public class MinecraftRedisVelocity {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        Manager.setup();
+        Manager.setup(() -> proxy.getAllPlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet()));
         log.info("Register plugin messaging channels.");
         // TODO: 25.06.21 get channel names from Network class
         sendPlayersToGroupChannel = MinecraftChannelIdentifier.create("minecraftredis", "sendToGroup");
@@ -125,7 +126,7 @@ public class MinecraftRedisVelocity {
             event.setResult(KickedFromServerEvent.DisconnectPlayer.create(serverKickReason.orElse(
                     Component.text("The server you were on kicked you.", NamedTextColor.RED))
             ));
-            new com.github.offby0point5.mcredis.Player(event.getPlayer().getUniqueId()).delete();
+            Manager.disconnectPlayer(player.getUniqueId());
             return;
         }
         String serverName = Manager.getJoinServer(player.getUniqueId(), groupName);
@@ -133,7 +134,7 @@ public class MinecraftRedisVelocity {
             event.setResult(KickedFromServerEvent.DisconnectPlayer.create(serverKickReason.orElse(
                     Component.text("The server you were on kicked you.", NamedTextColor.RED))
             ));
-            new com.github.offby0point5.mcredis.Player(event.getPlayer().getUniqueId()).delete();
+            Manager.disconnectPlayer(player.getUniqueId());
             return;
         }
         Optional<RegisteredServer> optionalRegisteredServer = proxy.getServer(serverName);
@@ -142,7 +143,7 @@ public class MinecraftRedisVelocity {
                     Component.text("The server wanted you reconnected, but the new server does not exist.",
                             NamedTextColor.RED))
             ));
-            new com.github.offby0point5.mcredis.Player(event.getPlayer().getUniqueId()).delete();
+            Manager.disconnectPlayer(player.getUniqueId());
             return;
         }
         event.setResult(KickedFromServerEvent.RedirectPlayer.create(optionalRegisteredServer.get(),

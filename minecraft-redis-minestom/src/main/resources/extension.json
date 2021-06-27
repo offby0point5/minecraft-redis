@@ -1,6 +1,6 @@
 {
   "entrypoint": "com.github.offby0point5.minecraftredis.MinestomRedis",
-  "name": "minecraft-redis",
+  "name": "MinecraftRedis",
   "version": "Alpha",
   "dependencies": [],
   "externalDependencies": {

@@ -1,32 +1,41 @@
 package com.github.offby0point5.minecraftredis;
 
+import com.github.offby0point5.mcredis.Server;
+import com.github.offby0point5.mcredis.backend.Configuration;
 import com.github.offby0point5.mcredis.backend.Manager;
 import com.github.offby0point5.mcredis.datatype.ItemStack;
-import com.github.offby0point5.mcredis.rules.JoinRules;
-import com.github.offby0point5.mcredis.rules.KickRules;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.extensions.Extension;
 
-import java.util.List;
+import java.io.File;
+import java.net.InetSocketAddress;
 
 public class MinestomRedis extends Extension {
 
     @Override
     public void initialize() {
-        // TODO: 27.06.21 Read from a configuration file
-        String serverName = "server1";
-        String mainGroup = "lobby";
-        String[] allGroups = {};
+        @SuppressWarnings("UnstableApiUsage")
+        InetSocketAddress address = MinecraftServer.getNettyServer().getServerChannel().localAddress();
+        Configuration.setup(new File("minecraft-redis.toml"),
+                address::getHostName, address::getPort);
+        Configuration.reload();
 
-        Manager.setup(serverName,
-                MinecraftServer.getNettyServer().getServerChannel().localAddress(),
-                mainGroup,
-                new ItemStack.Builder("BIRCH_SAPLING", serverName)
-                        .lore(List.of("The lobby. Just the lobby."))
+        Manager.setup(Configuration.getServerId(),
+                new InetSocketAddress(Configuration.getServerHost(), Configuration.getServerPort()),
+                Configuration.getServerMain(),
+                new ItemStack.Builder(Configuration.getServerDefaultItemMaterial(),
+                        Configuration.getServerDefaultItemName())
+                        .lore(Configuration.getServerDefaultItemLore())
+                        .amount(Configuration.getServerDefaultItemAmount())
+                        .glowing(Configuration.getServerDefaultItemGlowing())
                         .build(),
-                JoinRules.NONE,
-                KickRules.NONE,
-                allGroups);
+                Configuration.getServerDefaultJoin(),
+                Configuration.getServerDefaultKick());
+
+        Server server = new Server(Configuration.getServerId());
+        for (String group : Configuration.getServerGroups()) {
+            server.addGroups(group);
+        }
         MinecraftServer.LOGGER.info("minecraft-redis started.");
     }
 

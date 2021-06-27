@@ -13,7 +13,7 @@ public class SendUtil {
         return new SendRequest(type, target);
     }
 
-    static class SendRequest {
+    public static class SendRequest {
         public final SendType type;
         public final String target;
 
@@ -22,7 +22,7 @@ public class SendUtil {
             this.target = target;
         }
 
-        enum SendType {
+        public enum SendType {
             SERVER,
             GROUP
         }

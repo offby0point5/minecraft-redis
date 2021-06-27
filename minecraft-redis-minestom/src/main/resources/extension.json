@@ -1,0 +1,12 @@
+{
+  "entrypoint": "com.github.offby0point5.minecraftredis.MinestomRedis",
+  "name": "minecraft-redis",
+  "version": "Alpha",
+  "dependencies": [],
+  "externalDependencies": {
+    "repositories": [
+      {"name": "Central", "url": "https://repo1.maven.org/maven2/"}
+    ],
+    "artifacts": []
+  }
+}

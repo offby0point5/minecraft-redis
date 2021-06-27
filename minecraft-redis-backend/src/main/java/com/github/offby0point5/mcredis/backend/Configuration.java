@@ -59,9 +59,8 @@ public class Configuration {
 
     /**
      * Loads and validates the config file
-     * @return number of corrected errors in config
      */
-    public static int reload() {
+    public static void reload() {
         URL defaultConfigLocation = Configuration.class.getClassLoader().getResource("minecraft-redis.toml");
         if (defaultConfigLocation == null) {
             throw new RuntimeException("Default configuration file does not exist.");
@@ -73,10 +72,11 @@ public class Configuration {
                 .sync()
                 .build();
         config.load();
-
-        if (configSpec.isCorrect(config)) return -1;
-        return configSpec.correct(config, (action, path, incorrectValue, correctedValue)
+        boolean needSave = !configSpec.isCorrect(config);
+        configSpec.correct(config, (action, path, incorrectValue, correctedValue)
                 -> System.out.printf("%s %s %s %s%n", action, path, incorrectValue, correctedValue));
+        if (needSave) config.save();
+        config.close();
     }
 
     public interface GetInteger { int run();}

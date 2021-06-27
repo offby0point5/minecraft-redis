@@ -2,14 +2,13 @@ package com.github.offby0point5.mcredis.backend;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.github.offby0point5.mcredis.rules.JoinRules;
+import com.github.offby0point5.mcredis.rules.KickRules;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Configuration {
     public static final String SERVER_MAIN = "server.main";
@@ -104,12 +103,12 @@ public class Configuration {
         return new HashSet<>(config.getOrElse(SERVER_GROUPS, Collections.emptyList()));
     }
 
-    public static String getServerDefaultJoin() {
-        return config.getOrElse(SERVER_DEFAULT_JOIN, "LEAST");
+    public static JoinRules getServerDefaultJoin() {
+        return JoinRules.valueOf(config.getOrElse(SERVER_DEFAULT_JOIN, "LEAST"));
     }
 
-    public static String getServerDefaultKick() {
-        return config.getOrElse(SERVER_DEFAULT_KICK, "LOBBY");
+    public static KickRules getServerDefaultKick() {
+        return KickRules.valueOf(config.getOrElse(SERVER_DEFAULT_KICK, "LOBBY"));
     }
 
     public static String getServerDefaultItemName() {
@@ -128,7 +127,7 @@ public class Configuration {
         return config.getOrElse(SERVER_DEFAULT_ITEM_GLOWING, false);
     }
 
-    public static Set<String> getServerDefaultItemLore() {
-        return config.getOrElse(SERVER_DEFAULT_ITEM_LORE, Collections.emptySet());
+    public static List<String> getServerDefaultItemLore() {
+        return config.getOrElse(SERVER_DEFAULT_ITEM_LORE, Collections.emptyList());
     }
 }

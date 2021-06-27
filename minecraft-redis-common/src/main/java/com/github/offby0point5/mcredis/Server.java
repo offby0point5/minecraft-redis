@@ -145,9 +145,22 @@ public class Server {
         }
     }
 
+    public static boolean canJoin(ServerOnlineStatus status) {
+        switch (status) {
+            case ONLINE:
+            case SOFT_FULL:
+                return true;
+            case HARD_FULL:
+            case OFFLINE:
+                return false;
+        }
+        return false;
+    }
+
     public enum ServerOnlineStatus {
         ONLINE,
         SOFT_FULL,
-        HARD_FULL
+        HARD_FULL,
+        OFFLINE
     }
 }

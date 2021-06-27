@@ -6,6 +6,8 @@ import com.github.offby0point5.mcredis.Server;
 
 public enum KickRules {
     NONE((player, kickedFrom) -> null),
+    LOBBY((player, kickedFrom) -> new Group("lobby")),
+    GROUP((player, kickedFrom) -> new Group(kickedFrom.getMain())),
     ;
 
     private final ServerGroupKickRule rule;

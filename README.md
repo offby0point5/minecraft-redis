@@ -1,3 +1,7 @@
+# Use [mcredis](https://github.com/off-by-0point5/mcredis) not this repo!
+---
+---
+
 ## This readme describes the final state of the repo. It's still work in progress.
 
 ### Minecraft Redis
